@@ -18,3 +18,12 @@
 .Shape > span {
   font-size: 10em;
 }
+
+.Editor .scrollHandle {
+  position: fixed;
+  right: 0;
+  width: 40px;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.1);
+}

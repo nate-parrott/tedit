@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Hammer from 'react-hammerjs';
 import './Editor.css';
 import update from 'immutability-helper';
+import { computeHeight } from './helpers';
 
 export default class Editor extends Component {
   constructor(props) {
@@ -12,8 +13,8 @@ export default class Editor extends Component {
           test: {
             w: 30,
             h: 30,
-            x: 35,
-            y: 35,
+            x: 50,
+            y: 50,
             scale: 1,
             fill: '#f00',
             rotation: 0
@@ -26,6 +27,7 @@ export default class Editor extends Component {
     return (
       <div className='Editor'>
         <Canvas onChange={(c) => this.setState({canvas: c})} canvas={this.state.canvas} />
+        <div className='scrollHandle' />
       </div>
     )
   }
@@ -53,9 +55,15 @@ class Canvas extends Component {
   }
   render() {
     let style = {
-      fontSize: this.scale()
+      fontSize: this.scale(),
+      minHeight: (computeHeight(this.props.canvas.shapes || {}) + 0) + 'em'
     };
-    let content = <div onTouchMove={(e) => e.preventDefault()} ref={(n) => this.node = n } style={style} className='Canvas'>{this.renderShapes()}</div>;
+    let onClick = (e) => {
+      if (e.target === e.currentTarget) {
+        this.setState({selection: null});
+      }
+    };
+    let content = <div onTouchMove={(e) => e.preventDefault()} ref={(n) => this.node = n } style={style} className='Canvas' onClick={onClick}>{this.renderShapes()}</div>;
     return <Hammer onPanStart={this.panStart.bind(this)} 
                    onPan={this.pan.bind(this)} 
                    onPinchStart={this.pinchStart.bind(this)}
@@ -144,14 +152,7 @@ class Canvas extends Component {
     }
   }
   tap(e) {
-    // console.log(e.currentTarget);
-    // let shapeId = this.hitTest(e.center.x, e.center.y);
-    // console.log(shapeId);
-    // if (shapeId) {
-    //   this.setState({selection: shapeId});
-    // } else {
-    //   this.setState({selection: null});
-    // }
+    
   }
   // helpers:
   hitTest(x, y) {
@@ -172,8 +173,8 @@ let Shape = ({shape, selected, onTap}) => {
   let style = {
     width: shape.w + 'em', 
     height: shape.h + 'em', 
-    left: shape.x + 'em', 
-    top: shape.y + 'em',
+    left: shape.x - shape.w/2 + 'em', 
+    top: shape.y - shape.h/2 + 'em',
     backgroundColor: shape.fill,
     transform: transform
   };
